@@ -1,5 +1,5 @@
 # ds
-Loan Prediction Problem
+# Loan Prediction Problem
 
 This is the solution for Loan Prediction Problem on Analytics Vidhya. Here training data and test data are provided in seperate CSV problem. Based on the understanding from training data, we need to predict whether loan should be given in Test Data.
 Here are a few inferences, you can draw by looking at the output of describe() function:
@@ -12,19 +12,19 @@ We can also look that about 84% applicants have a credit_history. How? The mean 
 The ApplicantIncome distribution seems to be in line with expectation. Same with CoapplicantIncome
 
 For training the model, we need the data to be inline with what machine can understand. So, for string values we need to map int values. Such as- gender->map('F':0,'M':1)
-#Code
-loan['Gender']=loan['Gender'].map({'Female':0,'Male':1})
+ # Code
+  loan['Gender']=loan['Gender'].map({'Female':0,'Male':1})
 Similarly, we map following columns to integers-
 
   Married,Education,Self_Employed,Property_Area,Loan_Status
   
 In Dependent column, there's a value 3+. This cannot be interpreted by the machine. Hence, we replace 3+ by 4
-#Code
+ # Code
 
-loan['Dependents'].replace('3+', 4,inplace=True)
+  loan['Dependents'].replace('3+', 4,inplace=True)
 
 Now, for fixing NaN values, we replace NaN with either the mean or the mode of the column
-#Code
+ # Code
 
   loan['Gender'] = loan['Gender'].fillna( loan['Gender'].dropna().mode().values[0] )
   loan['Married'] = loan['Married'].fillna( loan['Married'].dropna().mode().values[0] )
@@ -36,7 +36,7 @@ Now, for fixing NaN values, we replace NaN with either the mean or the mode of t
 
 Let's normalize the independent variables.This can be done using StandardScaler(). The idea behind StandardScaler is that it will transform your data such that its distribution will have a mean value 0 and standard deviation of 1.
 
-#Code
+ # Code
 
   X_train=loan.iloc[:, 1:-1]
   print(X_train)
@@ -45,21 +45,20 @@ Let's normalize the independent variables.This can be done using StandardScaler(
   
  Using Random Forests for curve fitting
  
-  # Code
+ # Code
   
   rf = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=0)
   rf.fit(X_train_std, y_train)
   
  Now when we have got the curve, we can predict whether a loan can be disbursed or not in test data. We need to do same transformations as above on test.csv
   
- #Code
+ # Code
  
   loan_test=pd.read_csv('C:\\Users\\deeksha.aneja\\Desktop\\jigsaw\\dsProjects\\loanPrediction\\test.csv')
   loan_test['Gender'] = loan_test['Gender'].map({'Female':0,'Male':1})
   loan_test['Married'] = loan_test['Married'].map({'No':0, 'Yes':1}).astype(np.int)
   loan_test['Education'] = loan_test['Education'].map({'Not Graduate':0, 'Graduate':1}).astype(np.int)
   loan_test['Self_Employed'] = loan_test['Self_Employed'].map({'No':0, 'Yes':1})
-  # loan_test['Dependents'] = loan_test['Dependents'].str.rstrip('+')
   loan_test['Dependents'].replace('3+', 4,inplace=True)
   loan_test['Gender'] = loan_test['Gender'].fillna( loan_test['Gender'].dropna().mode().values[0]).astype(np.int)
   loan_test['Dependents'] = loan_test['Dependents'].fillna( loan_test['Dependents'].dropna().mode().values[0]).astype(np.int)
