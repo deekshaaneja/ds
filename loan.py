@@ -69,7 +69,8 @@ loan_test['Gender'] = loan_test['Gender'].map({'Female':0,'Male':1})
 loan_test['Married'] = loan_test['Married'].map({'No':0, 'Yes':1}).astype(np.int)
 loan_test['Education'] = loan_test['Education'].map({'Not Graduate':0, 'Graduate':1}).astype(np.int)
 loan_test['Self_Employed'] = loan_test['Self_Employed'].map({'No':0, 'Yes':1})
-loan_test['Dependents'] = loan_test['Dependents'].str.rstrip('+')
+# loan_test['Dependents'] = loan_test['Dependents'].str.rstrip('+')
+loan_test['Dependents'].replace('3+', 4,inplace=True)
 loan_test['Gender'] = loan_test['Gender'].fillna( loan_test['Gender'].dropna().mode().values[0]).astype(np.int)
 loan_test['Dependents'] = loan_test['Dependents'].fillna( loan_test['Dependents'].dropna().mode().values[0]).astype(np.int)
 loan_test['Self_Employed'] = loan_test['Self_Employed'].fillna( loan_test['Self_Employed'].dropna().mode().values[0])
@@ -80,11 +81,14 @@ loan_test['Property_Area'] = loan_test['Property_Area'].map({'Urban':3, 'Semiurb
 X_test = loan_test.iloc[:,1:]
 X_test_std = slc.transform(X_test)
 y_test_pred = rf.predict(X_test_std)
-print(y_test_pred)
+# print(y_test_pred)
 loan_test['Loan_Status'] = y_test_pred
+loan_final = loan_test.drop(['Gender', 'Married', 'Dependents', 'Education', 'Self_Employed', 'ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History', 'Property_Area'], axis=1)
 
+loan_final['Loan_Status'] = loan_final['Loan_Status'].map({0:'N', 1:'Y'})
+print(loan_final)
+loan_final.to_csv('my_submission.csv', index=False)
 
-# In[ ]:
 
 
 
