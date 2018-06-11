@@ -12,19 +12,24 @@ We can also look that about 84% applicants have a credit_history. How? The mean 
 The ApplicantIncome distribution seems to be in line with expectation. Same with CoapplicantIncome
 
 For training the model, we need the data to be inline with what machine can understand. So, for string values we need to map int values. Such as- gender->map('F':0,'M':1)
- # Code
-  loan['Gender']=loan['Gender'].map({'Female':0,'Male':1})
+
+ Code
+
+ loan['Gender']=loan['Gender'].map({'Female':0,'Male':1})
+ 
 Similarly, we map following columns to integers-
 
   Married,Education,Self_Employed,Property_Area,Loan_Status
   
 In Dependent column, there's a value 3+. This cannot be interpreted by the machine. Hence, we replace 3+ by 4
- # Code
+ 
+ Code
 
   loan['Dependents'].replace('3+', 4,inplace=True)
-
+  
+# Handling NaNs
 Now, for fixing NaN values, we replace NaN with either the mean or the mode of the column
- # Code
+ Code
 
   loan['Gender'] = loan['Gender'].fillna( loan['Gender'].dropna().mode().values[0] )
   loan['Married'] = loan['Married'].fillna( loan['Married'].dropna().mode().values[0] )
@@ -34,9 +39,10 @@ Now, for fixing NaN values, we replace NaN with either the mean or the mode of t
   loan['Loan_Amount_Term'] = loan['Loan_Amount_Term'].fillna( loan['Loan_Amount_Term'].dropna().mode().values[0] )
   loan['Credit_History'] = loan['Credit_History'].fillna( loan['Credit_History'].dropna().mode().values[0] )
 
+# Normalization
 Let's normalize the independent variables.This can be done using StandardScaler(). The idea behind StandardScaler is that it will transform your data such that its distribution will have a mean value 0 and standard deviation of 1.
 
- # Code
+ Code
 
   X_train=loan.iloc[:, 1:-1]
   print(X_train)
@@ -45,14 +51,15 @@ Let's normalize the independent variables.This can be done using StandardScaler(
   
  Using Random Forests for curve fitting
  
- # Code
+ Code
   
   rf = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=0)
   rf.fit(X_train_std, y_train)
   
+ # Apply on Test Data
  Now when we have got the curve, we can predict whether a loan can be disbursed or not in test data. We need to do same transformations as above on test.csv
   
- # Code
+ Code
  
   loan_test=pd.read_csv('C:\\Users\\deeksha.aneja\\Desktop\\jigsaw\\dsProjects\\loanPrediction\\test.csv')
   loan_test['Gender'] = loan_test['Gender'].map({'Female':0,'Male':1})
@@ -70,10 +77,10 @@ Let's normalize the independent variables.This can be done using StandardScaler(
   X_test = loan_test.iloc[:,1:]
   X_test_std = slc.transform(X_test)
   y_test_pred = rf.predict(X_test_std)
-# print(y_test_pred)
-loan_test['Loan_Status'] = y_test_pred
-loan_final = loan_test.drop(['Gender', 'Married', 'Dependents', 'Education', 'Self_Employed', 'ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History', 'Property_Area'], axis=1)
+  print(y_test_pred)
+  loan_test['Loan_Status'] = y_test_pred
+  loan_final = loan_test.drop(['Gender', 'Married', 'Dependents', 'Education', 'Self_Employed', 'ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History', 'Property_Area'], axis=1)
 
-loan_final['Loan_Status'] = loan_final['Loan_Status'].map({0:'N', 1:'Y'})
-print(loan_final)
-loan_final.to_csv('my_submission.csv', index=False)
+  loan_final['Loan_Status'] = loan_final['Loan_Status'].map({0:'N', 1:'Y'})
+  print(loan_final)
+  loan_final.to_csv('my_submission.csv', index=False)
